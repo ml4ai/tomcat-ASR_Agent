@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Install dependencies for the tomcat-ASR_Agent program using MacPorts
+
+sudo port -N install \
+    protobuf-c\
+    grpc
