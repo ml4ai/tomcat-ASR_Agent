@@ -79,6 +79,13 @@ class Mosquitto {
     void publish(const std::string& topic, const std::string& message);
 
     /**
+     * Publishes a binary message to a topic.
+     *
+     * @param topic: message's topic
+     * @param payload: binary payload
+     */
+    void publish_binary(const std::string& topic, const char* payload, int n);
+    /**
      * Loop through messages. This call usually blocks until the connection is
      * closed.
      *

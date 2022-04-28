@@ -179,6 +179,22 @@ void Mosquitto::publish(const string& topic, const string& message) {
     }
 }
 
+void Mosquitto::publish_binary(const string& topic, const char* payload, int n) {
+    const int qos = 2;
+    int error_code = mosquitto_publish(this->mqtt_client,
+                                       NULL,
+                                       topic.c_str(),
+                                       n,
+                                       (const void*)payload,
+                                       qos,
+                                       false);
+    if (error_code != MOSQ_ERR_SUCCESS) {
+        stringstream ss;
+        ss << "It was not possible to publish in the topic " << topic;
+        this->on_error(ss.str());
+    }
+}
+
 void Mosquitto::loop(const bool try_reconnect) {
     int error_counter = 0;
     int max_packets = 10;

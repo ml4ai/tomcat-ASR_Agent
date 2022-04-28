@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_definitions(BOOST_DATE_TIME_POSIX_TIME_STD_CONFIG)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
+get_cmake_property(_variableNames VARIABLES)
 add_definitions(-DBOOST_LOG_DYN_LINK)
 find_package(
     Boost 
@@ -23,6 +23,9 @@ find_package(
 find_package(nlohmann_json REQUIRED)
 find_package(SMILEapi REQUIRED)
 find_package(Mosquitto REQUIRED)
+
+list(APPEND CMAKE_MODULE_PATH "/usr/lib/x86_64-linux-gnu/cmake")
+find_package(PahoMqttCpp REQUIRED)
 
 option(BUILD_GOOGLE_CLOUD_SPEECH_LIB "Build google_cloud_speech library" ON)
 
@@ -61,7 +64,8 @@ if(NOT BUILD_GOOGLE_CLOUD_SPEECH_LIB)
     target_link_libraries(asr_agent protobuf::libprotobuf gRPC::grpc++)
 endif()
 
-
+# Paho MQTT libraries
+target_link_libraries(asr_agent PahoMqttCpp::paho-mqttpp3)
 
 file(COPY conf/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/conf/)
 file(COPY data/test/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data/test/)

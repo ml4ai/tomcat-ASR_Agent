@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 #ubuntu setup
 ENV DEBIAN_FRONTEND "noninteractive"
@@ -21,11 +21,14 @@ RUN apt-get update -y && apt-get upgrade -y && \
     nlohmann-json3-dev \
 
     # Mosquitto
+    libssl-dev \
+    libpaho-mqttpp-dev \
+    libpaho-mqtt-dev \
     mosquitto mosquitto-clients libmosquitto-dev 
 
 
 #Install protobuf and grpc
-ENV GRPC_RELEASE_TAG v1.35.x
+ENV GRPC_RELEASE_TAG v1.45.x
 RUN git clone -b ${GRPC_RELEASE_TAG} https://github.com/grpc/grpc /var/local/git/grpc && \
         cd /var/local/git/grpc && \
     git submodule update --init --recursive && \
