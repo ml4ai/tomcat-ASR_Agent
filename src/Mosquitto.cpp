@@ -179,6 +179,7 @@ void Mosquitto::publish(const string& topic, const string& message) {
     }
 }
 
+
 void Mosquitto::loop(const bool try_reconnect) {
     int error_counter = 0;
     int max_packets = 10;

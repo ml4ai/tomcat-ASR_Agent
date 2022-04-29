@@ -5,7 +5,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <deque>
 #include <nlohmann/json.hpp>
-#include <smileapi/SMILEapi.h>
 #include <string>
 #include <thread>
 #include <vector>

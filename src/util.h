@@ -2,7 +2,6 @@
 #include "JsonBuilder.h"
 #include "google/cloud/speech/v1/cloud_speech.grpc.pb.h"
 #include <grpc++/grpc++.h>
-#include <smileapi/SMILEapi.h>
 
 #include <boost/beast/core.hpp>
 

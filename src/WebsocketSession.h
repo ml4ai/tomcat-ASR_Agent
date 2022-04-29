@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <thread>
 
+#include <mqtt/client.h>
+
 #include "JsonBuilder.h"
 #include "SpeechWrapper.h"
 #include "SpeechWrapperVosk.h"
@@ -26,7 +28,6 @@
 #include "google/cloud/speech/v1/cloud_speech.grpc.pb.h"
 #include <grpc++/grpc++.h>
 
-#include "base64.h"
 #include "arguments.h"
 #include "util.h"
 
@@ -59,8 +60,9 @@ class WebsocketSession : public enable_shared_from_this<WebsocketSession> {
     SpeechWrapperVosk* speech_handler_vosk;
     
     // MQTT client
-    Mosquitto mqtt_client;
-
+    //Mosquitto mqtt_client;
+    mqtt::client *mqtt_client; 
+    
     // Threads
     std::thread consumer_thread;
     std::thread asr_reader_thread;
@@ -137,10 +139,17 @@ class WebsocketSession : public enable_shared_from_this<WebsocketSession> {
         this->builder->participant_id = this->participant_id;
         this->builder->Initialize();
 
-        // TODO: Initialize data for publishing chunks to message bus
+        // Initialize data for publishing chunks to message bus
         if (!this->args.disable_opensmile) {
-		this->mqtt_client.connect(this->args.mqtt_host_internal, this->args.mqtt_port_internal, 1000, 1000, 1000);
-		this->mqtt_client.set_max_seconds_without_messages(10000);
+		// Create client object
+		std::string server_address = "tcp://" + this->args.mqtt_host_internal + ":" + std::to_string(this->args.mqtt_port_internal);		      this->mqtt_client = new mqtt::client(server_address, this->participant_id);	
+		
+		// Connect to internal mqttt bus
+		mqtt::connect_options connOpts;		
+		connOpts.set_keep_alive_interval(20);
+		connOpts.set_clean_session(true);
+
+		this->mqtt_client->connect(connOpts);
         }
         // Initialize Google Speech Session
         if (!this->args.disable_asr_google) {
@@ -188,9 +197,9 @@ class WebsocketSession : public enable_shared_from_this<WebsocketSession> {
             this->speech_handler_vosk->end_stream();
         }
         
-	//TODO: Free publishing chunks to message bus data
+	// Free publishing chunks to message bus data
 	if (!this->args.disable_opensmile) {
-        	this->mqtt_client.close();
+		this->mqtt_client->disconnect();
 	}
 
         this->builder->Shutdown();
@@ -255,19 +264,9 @@ class WebsocketSession : public enable_shared_from_this<WebsocketSession> {
                 if (!this->args.disable_asr_vosk) {
                     this->speech_handler_vosk->send_chunk(int_chunk);
                 }
-                // TODO: Publish chunks over message buss
+                // Publish chunks over message buss
                 if (!args.disable_opensmile) {
-			// Encode audio chunk
-			int encoded_data_length = Base64encode_len(chunk.size());
-			char output[encoded_data_length];
-			Base64encode(output, &chunk[0], chunk.size());
-			string encoded(output);
-	
-			// Publish to message bus	
-			nlohmann::json message;
-			message["chunk"]=encoded;
-			message["increment"]=this->increment;
-			this->mqtt_client.publish(this->participant_id, message.dump());	
+			this->mqtt_client->publish(this->participant_id, &chunk[0], chunk.size());
                 }
 		this->increment++;
             }
