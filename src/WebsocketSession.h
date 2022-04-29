@@ -28,7 +28,6 @@
 #include "google/cloud/speech/v1/cloud_speech.grpc.pb.h"
 #include <grpc++/grpc++.h>
 
-#include "base64.h"
 #include "arguments.h"
 #include "util.h"
 

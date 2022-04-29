@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_definitions(BOOST_DATE_TIME_POSIX_TIME_STD_CONFIG)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-get_cmake_property(_variableNames VARIABLES)
 add_definitions(-DBOOST_LOG_DYN_LINK)
 find_package(
     Boost 
@@ -21,10 +20,7 @@ find_package(
     REQUIRED
 )
 find_package(nlohmann_json REQUIRED)
-find_package(SMILEapi REQUIRED)
 find_package(Mosquitto REQUIRED)
-
-list(APPEND CMAKE_MODULE_PATH "/usr/lib/x86_64-linux-gnu/cmake")
 find_package(PahoMqttCpp REQUIRED)
 
 option(BUILD_GOOGLE_CLOUD_SPEECH_LIB "Build google_cloud_speech library" ON)
@@ -47,12 +43,10 @@ add_executable(asr_agent
     src/SpeechWrapper.cpp
     src/SpeechWrapperVosk.cpp
     src/util.cpp
-    src/base64.c
 )
 
 target_link_libraries(
     asr_agent 
-    SMILEapi 
     nlohmann_json::nlohmann_json
     ${Mosquitto_LIBRARIES}
     ${Boost_LIBRARIES}

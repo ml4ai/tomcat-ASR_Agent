@@ -2,7 +2,6 @@
 #include "GlobalMosquittoListener.h"
 #include "Mosquitto.h"
 #include "arguments.h"
-#include "base64.h"
 
 #include "google/cloud/speech/v1/cloud_speech.grpc.pb.h"
 #include <boost/date_time/posix_time/posix_time.hpp>
