@@ -39,10 +39,6 @@ RUN git clone -b ${GRPC_RELEASE_TAG} https://github.com/grpc/grpc /var/local/git
     make -j $(nproc) install 
 
 
-# Build opensmile
-COPY tools/install_opensmile_from_source .
-RUN ./install_opensmile_from_source
-
 # speechAnalyzer setup
 COPY external /asr_agent/external
 WORKDIR /asr_agent/external

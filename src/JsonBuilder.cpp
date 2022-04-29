@@ -22,7 +22,6 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <regex>
-#include <smileapi/SMILEapi.h>
 #include <string>
 #include <thread>
 

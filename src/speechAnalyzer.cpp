@@ -4,7 +4,6 @@
 #include <fstream>
 #include <iostream>
 #include <mutex>
-#include <smileapi/SMILEapi.h>
 #include <string>
 #include <thread>
 #include <vector>
