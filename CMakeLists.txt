@@ -18,6 +18,7 @@ find_package(
     program_options
     coroutine
     log
+    log_setup
     REQUIRED
 )
 find_package(nlohmann_json REQUIRED)

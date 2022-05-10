@@ -10,10 +10,12 @@
 #include <vector>
 
 // Boost
-#include <boost/chrono.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/console.hpp>
+#include <boost/log/utility/setup/file.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/chrono.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -79,6 +81,8 @@ int main(int argc, char* argv[]) {
     // Enable Boost logging
     boost::log::add_console_log(std::cout,
                                 boost::log::keywords::auto_flush = true);
+    boost::log::add_file_log(boost::log::keywords::file_name = "/logs/%Y-%m-%d_%H-%M-%S.%N.log",
+		             boost::log::keywords::auto_flush = true);
 
     // Handle options
     Arguments args;
