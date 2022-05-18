@@ -10,12 +10,19 @@
 #include <vector>
 
 // Boost
+#include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
-#include <boost/log/utility/setup/console.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/sinks/text_file_backend.hpp>
 #include <boost/log/utility/setup/file.hpp>
+#include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/sources/record_ostream.hpp>
 #include <boost/chrono.hpp>
+#include <boost/log/support/date_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -46,6 +53,11 @@
 #include "HTTPSession.h"
 
 #include "Listener.h"
+
+namespace logging = boost::log;
+namespace src = boost::log::sources;
+namespace expr = boost::log::expressions;
+namespace keywords = boost::log::keywords;
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -79,13 +91,28 @@ Arguments WebsocketSession::args;
 
 int main(int argc, char* argv[]) {
     // Enable Boost logging
+    boost::log::add_common_attributes();
     boost::log::add_console_log(std::cout,
-                                boost::log::keywords::auto_flush = true);
+                                boost::log::keywords::auto_flush = true,
+                                keywords::format =
+				(
+				    expr::stream
+					<< expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
+					<< ": <" << logging::trivial::severity
+					<< "> " << expr::smessage
+				));
     boost::log::add_file_log(boost::log::keywords::file_name = "/logs/%Y-%m-%d_%H-%M-%S.%N.log",
-		             boost::log::keywords::auto_flush = true);
+                             boost::log::keywords::auto_flush = true,
+                                keywords::format =
+				(
+				    expr::stream
+					<< expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
+					<< ": <" << logging::trivial::severity
+					<< "> " << expr::smessage
+				));
 
     // Handle options
-    Arguments args;
+   Arguments args;
     try {
         options_description desc{"Options"};
         desc.add_options()("help,h", "Help screen")(
