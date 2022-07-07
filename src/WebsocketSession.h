@@ -203,22 +203,12 @@ class WebsocketSession : public enable_shared_from_this<WebsocketSession> {
             while (spsc_queue.pop(chunk)) {
                 this->samples_done += 4096;
                 // Create f32 and i16 chunks
-                std::vector<float> float_chunk(chunk.size() / sizeof(float));
                 std::vector<int16_t> int_chunk(chunk.size() / sizeof(int16_t));
-                if (this->is_float) {
-                    memcpy(&float_chunk[0], &chunk[0], chunk.size());
-                    int_chunk.clear();
-                    for (float f : float_chunk) {
-                        int_chunk.push_back((int16_t)(f * 32768));
-                    }
-                }
-                else if (this->is_int16) {
-                    memcpy(&int_chunk[0], &chunk[0], chunk.size());
-                    float_chunk.clear();
-                    for (int i : int_chunk) {
-                        float_chunk.push_back((float)(i / 32768.0));
-                    }
-                }
+                std::vector<float> float_chunk(0); // Currently assume int16 incoming samples
+		memcpy(&int_chunk[0], &chunk[0], chunk.size());
+		for (int i : int_chunk) {
+			float_chunk.push_back((float)(i / 32768.0));
+		}
 
                 // Write to google asr service
                 if (!this->args.disable_asr_google) {
@@ -257,10 +247,14 @@ class WebsocketSession : public enable_shared_from_this<WebsocketSession> {
                 }
                 // TODO: Publish chunks over message buss
                 if (!args.disable_opensmile) {
+			// Since base64 code is pure c, we can't encode directly from vector
+			char float_chunk_bytes[float_chunk.size() * sizeof(float)];
+			memcpy(float_chunk_bytes, &float_chunk[0], float_chunk.size() * sizeof(float));
+
 			// Encode audio chunk
-			int encoded_data_length = Base64encode_len(chunk.size());
+			int encoded_data_length = Base64encode_len(float_chunk.size() * sizeof(float));
 			char output[encoded_data_length];
-			Base64encode(output, &chunk[0], chunk.size());
+			Base64encode(output, float_chunk_bytes, float_chunk.size() * sizeof(float));
 			string encoded(output);
 	
 			// Publish to message bus	
