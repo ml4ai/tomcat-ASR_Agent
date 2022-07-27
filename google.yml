@@ -1,0 +1,34 @@
+version: '3'
+
+networks:
+  tomcat:
+   external: true
+
+services:
+  asr_agent:
+    image: asr_agent:latest
+    container_name: asr_agent
+    ports:
+      - 8888:8888
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/google_application_credentials.json
+    volumes:
+      - ./google_application_credentials.json:/google_application_credentials.json
+      - ./logs:/logs
+      - ./conf:/conf
+    networks:
+      tomcat:
+        aliases:
+          - asr_agent
+    entrypoint: ./asr_agent --mode websocket --mqtt_host host.docker.internal --mqtt_port 1883 --disable_asr_google false --disable_asr_vosk true --disable_opensmile false
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto-internal
+    ports:
+      - 1885:1883
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      tomcat:
+        aliases:
+          - asr_agent-mosquitto 

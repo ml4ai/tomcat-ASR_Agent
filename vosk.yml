@@ -1,0 +1,40 @@
+version: '3'
+
+networks:
+  tomcat:
+   external: true
+
+services:
+  asr_agent:
+    image: asr_agent:latest
+    container_name: asr_agent
+    ports:
+      - 8888:8888
+    volumes:
+      - ./logs:/logs
+      - ./conf:/conf
+    networks:
+      tomcat:
+        aliases:
+          - asr_agent
+    entrypoint: ./asr_agent --mode websocket --mqtt_host host.docker.internal --mqtt_port 1883 --disable_asr_google true --disable_asr_vosk false --disable_opensmile false
+  vosk:
+    image: alphacep/kaldi-en:latest
+    container_name: vosk
+    ports:
+      - 2700:2700
+    networks:
+      tomcat:
+        aliases:
+          - vosk
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto-internal
+    ports:
+      - 1885:1883
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      tomcat:
+        aliases:
+          - asr_agent-mosquitto 

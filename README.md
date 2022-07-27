@@ -1,4 +1,4 @@
-tomcat-speechAnalyzer
+tomcat-ASRAgent
 ================
 
 Agent that listens to the microphone and outputs messages corresponding to
@@ -47,9 +47,15 @@ export GRPC_DEFAULT_SSL_ROOTS_FILE_PATH="$PWD/roots.pem"
 
 Docker instructions
 -------------------
+Create the tomcat network:
+The asr_agent uses an internal Docker network named tomcat to connect its components. It must be created before  running docker-compose:
+	docker network create tomcat
 
-You can launch a containerized version of the agent that publishes to an MQTT
-message bus using Docker Compose:
+Google Cloud Engine:
+	docker-compose -f google.yml up --build
 
-    docker-compose up --build
+Vosk Speech Engine:
+	docker-compose -f vosk.yml up --build
+
+By default, Docker will use a mosquitto broker running on 1883 on the host machine. If you are using a different Mosquitto broker, modify the mqtt_host and mqtt_port command line option in the asr_agent service entrypoint.
 
