@@ -61,5 +61,5 @@ The asr_agent uses an internal Docker network named tomcat to connect its compon
 
 	docker-compose -f vosk.yml up --build
 
-By default, Docker will use a mosquitto broker running on 1883 on the host machine. If you are using a different Mosquitto broker, modify the mqtt_host and mqtt_port command line option in the asr_agent service entrypoint.
+By default, Docker will use connect to a mosquitto broker running on port 1883 of the host machine. If you are using a different Mosquitto broker, modify the mqtt_host and mqtt_port command line option in the asr_agent service entrypoint in google.yml or vosk.yml.
 
